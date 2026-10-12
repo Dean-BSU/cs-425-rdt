@@ -1,21 +1,28 @@
-#include "lab.h"
+#include "rdt.h"
+#include "io.h"
 #include <stdio.h>
-#include <stdlib.h>
+#include <string.h>
 
 #ifdef TEST
 #define main main_exclude
 #endif
 
-
-
-int main(void)
+int main(int argc, char *argv[])
 {
-    char *greeting = get_greeting("World");
-    if (greeting) {
-        printf("%s\n", greeting);
-        free(greeting); // Free the allocated memory for the greeting
-    } else {
-        printf("Failed to create greeting.\n");
+    rdt_config_t config;
+
+    if (argc == 1) {
+        rdt_print_usage(argv[0]);
+        return 0;
     }
-    return 0;
+    if (argc == 2 && (strcmp(argv[1], "-h") == 0 ||
+                      strcmp(argv[1], "--help") == 0)) {
+        rdt_print_usage(argv[0]);
+        return 0;
+    }
+    if (rdt_parse_args(argc, argv, &config) != 0) {
+        rdt_print_usage(argv[0]);
+        return 1;
+    }
+    return rdt_run(&config) == 0 ? 0 : 2;
 }

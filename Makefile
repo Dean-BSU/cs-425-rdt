@@ -70,7 +70,7 @@ $(BUILD_DIR)/%.c.o: $(TEST_DIR)/%.c
 
 
 # Targets for running tests and cleaning up
-.PHONY: release debug test debug-test all clean print check report report-txt leak leak-test
+.PHONY: release debug test debug-test all clean print check report report-txt leak leak-test transfer-seeds
 # These targets allow you to build in different modes without changing the BUILD variable
 # You can run `make debug`, `make release`, etc.
 # Each target will set the BUILD variable and call the main Makefile target
@@ -82,6 +82,12 @@ test:
 	$(MAKE) BUILD=test
 debug-test:
 	$(MAKE) BUILD=debug-test
+
+transfer-seeds:
+	mkdir -p build
+	$(CC) $(CFLAGS) -Isrc -Itests tools/transfer-seeds.c tests/transfer_sim.c \
+		src/gbn.c src/packet.c -o build/transfer-seeds
+	./build/transfer-seeds
 
 all:
 	@if [[ -e $(SRC_DIR)/main.c ]]; then \
@@ -140,8 +146,8 @@ report:
 	./build/tests/$(APP_NAME)_t
 	mkdir -p ./build/report/html
 	mkdir -p ./build/report/txt
-	gcovr -r . --html --html-details --exclude-directories build/tests/harness --exclude '.*main\.c$$' --exclude '.*test\.c$$' -o ./build/report/html/coverage_report.html
-	gcovr -r . --txt                 --exclude-directories build/tests/harness --exclude '.*main\.c$$' --exclude '.*test\.c$$'
+	gcovr -r . --html --html-details --exclude-directories build/tests/harness --exclude '.*main\.c$$' --exclude '.*test\.c$$' --exclude '.*io\.c$$' --exclude '.*transfer_sim\.c$$' -o ./build/report/html/coverage_report.html
+	gcovr -r . --txt                 --exclude-directories build/tests/harness --exclude '.*main\.c$$' --exclude '.*test\.c$$' --exclude '.*io\.c$$' --exclude '.*transfer_sim\.c$$'
 
 
 help:
